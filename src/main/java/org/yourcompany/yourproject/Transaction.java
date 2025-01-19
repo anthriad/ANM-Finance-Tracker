@@ -1,3 +1,5 @@
+package org.yourcompany.yourproject;
+
 import java.util.*;
 
 public class Transaction 
@@ -6,6 +8,7 @@ public class Transaction
   private String Company;
   private String Description;
   private float Amount;
+  private String AuthorizedBy;
 
 
   public Transaction(Date date, String company, String description, float amount)
@@ -14,6 +17,7 @@ public class Transaction
     this.Company = company;
     this.Description = description;
     this.Amount = amount;
+    this.AuthorizedBy = "";
   }
 
   public Date getDate()
@@ -54,5 +58,11 @@ public class Transaction
     return this.Amount;
   }
 
+  public String getAuthorizedBy() {
+    return AuthorizedBy;
+  }
 
+  public void setAuthorizedBy(String authorizedBy) {
+    AuthorizedBy = authorizedBy;
+  }
 }
