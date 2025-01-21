@@ -6,24 +6,24 @@ import java.sql.ResultSet;
 import java.sql.Statement;
 import java.util.*;
 import java.util.Date;
-import java.sql.*;
 
 
 public class Expenses extends Transaction
 {
-	  private int totalExpenses = 0;
+	  private double totalExpenses = 0;
 //      private String authorizedBy = "";
 
   // primary constructor
 	public Expenses(Date date, String description, float amount, String company, String authorizedBy)
 	{
-		super(date, description, amount, company, authorizedBy);
+		super(date, company, description, amount);
+		this.setAuthorizedBy(authorizedBy);
 	}
 
   // overloaded constructor
   public Expenses(float amount, String description) 
   {
-    this(new Date(), description, amount, "");
+    this(new Date(), description, amount, "", "");
   }
 
   private void displayAllExpenses()
@@ -33,7 +33,7 @@ public class Expenses extends Transaction
 
     try (Connection conn = DB.connect();
          PreparedStatement ps = conn.prepareStatement(sql);
-         ResultSet rs = ps.executeQuery();)
+         ResultSet rs = ps.executeQuery())
     {
       int columnCount = rs.getMetaData().getColumnCount();
 
@@ -55,15 +55,14 @@ public class Expenses extends Transaction
     }
   }
 
-  private void deleteExpense()
+  private void deleteExpense(int id)
   {
 
     String sql = "DELETE FROM Expenses WHERE ID = ?";
     try (Connection conn = DB.connect();
          PreparedStatement ps = conn.prepareStatement(sql))
     {
-      ps.setInt(1, id); /* asr 2025-01-19 need to add id column into database table to track each
-                                                        expense that gets added. */
+      ps.setInt(1, id);
       ps.executeUpdate();
 
     }
@@ -149,15 +148,33 @@ public class Expenses extends Transaction
     }
   }
 
-  private int getTotalExpenses()
+//  private double getTotalExpenses()
+  private void getTotalExpenses()
   {
-    try 
+
+    String sql = "SELECT SUM(Amount) AS total_expenses FROM Expenses";
+
+    try (Connection conn = DB.connect();
+         Statement st = conn.createStatement();
+         ResultSet rs = st.executeQuery(sql))
     {
-      return totalExpenses; // returning the total amount of expenses that have accrued
+      if (rs.next())
+      {
+        totalExpenses = rs.getDouble("total_expenses");
+      }
+      else
+      {
+        System.out.println("No expenses found!");
+      }
+
+      System.out.println("Total expenses: " + totalExpenses);
+//      return totalExpenses; // returning the total amount of expenses that have accrued
     }
     catch (Exception ex)
     {
-      return 0;
+      ex.getStackTrace();
+      System.out.println("An error occurred while getting the expenses: " + ex.getMessage());
+//      return 0;
     }
   }
 
