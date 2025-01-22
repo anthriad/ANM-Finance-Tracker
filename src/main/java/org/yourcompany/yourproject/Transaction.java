@@ -7,11 +7,11 @@ public class Transaction
   private Date Date;
   private String Company;
   private String Description;
-  private float Amount;
+  private double Amount;
   private String AuthorizedBy;
 
 
-  public Transaction(Date date, String company, String description, float amount)
+  public Transaction(Date date, String company, String description, double amount)
   {
     this.Date = date;
     this.Company = company;
@@ -53,7 +53,7 @@ public class Transaction
     return this.Description;
   }
 
-  public float getAmount()
+  public double getAmount()
   {
     return this.Amount;
   }
