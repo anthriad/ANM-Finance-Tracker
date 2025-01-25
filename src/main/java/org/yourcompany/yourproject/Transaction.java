@@ -1,68 +1,70 @@
 package org.yourcompany.yourproject;
 
+import java.math.BigDecimal;
 import java.util.*;
 
 public class Transaction 
 {
-  private Date Date;
-  private String Company;
-  private String Description;
-  private double Amount;
-  private String AuthorizedBy;
+  private Date date;
+  private String company;
+  private String description;
+  private BigDecimal amount;
+  private String authorizedBy;
 
 
-  public Transaction(Date date, String company, String description, double amount)
+  public Transaction(Date date, String company, String description, BigDecimal amount)
   {
-    this.Date = date;
-    this.Company = company;
-    this.Description = description;
-    this.Amount = amount;
-    this.AuthorizedBy = "";
+    this.date = date;
+    this.company = company;
+    this.description = description;
+    this.amount = amount;
+    this.authorizedBy = "";
   }
 
   public Date getDate()
   {
-    return this.Date;
+    return this.date;
   }
 
   public String getCompany()
   {
-    return this.Company;
+    return this.company;
   }
   
   public Date setDate(Date date)
   {
-    this.Date = date;
-    return this.Date;
+    this.date = date;
+    return this.date;
   }
 
   public String setCompany(String company)
   {
-    this.Company = company;
-    return this.Company;
+    this.company = company;
+    return this.company;
   }
 
   public String getDescription()
   {
-    return this.Description;
+    return this.description;
   }
 
   public String setDescription(String description)
   {
-    this.Description = description;
-    return this.Description;
+    this.description = description;
+    return this.description;
   }
 
-  public double getAmount()
+  public BigDecimal getAmount()
   {
-    return this.Amount;
+    return this.amount;
   }
 
   public String getAuthorizedBy() {
-    return AuthorizedBy;
+    return this.authorizedBy;
   }
 
-  public void setAuthorizedBy(String authorizedBy) {
-    AuthorizedBy = authorizedBy;
+  public void setAuthorizedBy(String authorizedBy)
+  {
+    this.authorizedBy = authorizedBy;
   }
 }

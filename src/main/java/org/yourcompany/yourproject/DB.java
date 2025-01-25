@@ -8,9 +8,12 @@ public class DB {
         try {
             
           // Get database credentials from DatabaseConfig class
-            String jdbcURL = DatabaseConfig.getDbUrl();
-            String user = DatabaseConfig.getDbUsername();
-            String password = DatabaseConfig.getDbPassword();
+//            String jdbcURL = DatabaseConfig.getDbUrl();
+            String jdbcURL = "jdbc:postgresql://localhost:5432/anm_finance_tracker";
+//            String user = DatabaseConfig.getDbUsername();
+            String user = "postgres";
+//            String password = DatabaseConfig.getDbPassword();
+            String password = "AIinthemaking2027!";
 
             
             return DriverManager.getConnection(jdbcURL, user, password);

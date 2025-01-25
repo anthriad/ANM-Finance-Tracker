@@ -1,32 +1,30 @@
 package org.yourcompany.yourproject;
 
-import java.sql.Connection;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
-import java.sql.Statement;
+import java.math.BigDecimal;
+import java.sql.*;
 import java.util.*;
 import java.util.Date;
 
 
 public class Expenses extends Transaction
 {
-	  private static double totalExpenses = 0;
+	  private static BigDecimal totalExpenses = BigDecimal.valueOf(0.00);
 //      private String authorizedBy = "";
 
   // primary constructor
-  public Expenses(Date date, String description, double amount, String company, String authorizedBy)
+  public Expenses(Date date, String description, BigDecimal amount, String company, String authorizedBy)
   {
 		super(date, company, description, amount);
 		this.setAuthorizedBy(authorizedBy);
   }
 
   // overloaded constructor
-  public Expenses(double amount, String description)
+  public Expenses(BigDecimal amount, String description)
   {
     this(new Date(), description, amount, "", "");
   }
 
-  public Expenses(java.util.Date date, String company, String description, double amount) {
+  public Expenses(java.util.Date date, String company, String description, BigDecimal amount) {
     super(date, company, description, amount);
   }
 
@@ -64,46 +62,62 @@ public class Expenses extends Transaction
 
   public static int deleteExpense(int id)
   {
-
-    String sql = "DELETE FROM Expenses WHERE ID = ?";
-    try (Connection conn = DB.connect();
-         PreparedStatement ps = conn.prepareStatement(sql))
+    String sql = "DELETE FROM expenses WHERE expense_id = ?";
+    try (Connection conn = DB.connect())
     {
-      ps.setInt(1, id);
-      ps.executeUpdate();
+      conn.setAutoCommit(false);
+      try (PreparedStatement ps = conn.prepareStatement(sql))
+      {
+        ps.setInt(1, id);
+        ps.executeUpdate();
 
-      return 1;
+        conn.commit();
+        return 1;
+      }
+      catch (Exception ex) {
+        conn.rollback();
+        System.out.println("An error occurred while deleting the expense: " + ex.getMessage());
+        ex.printStackTrace();
+        return 0;
+      }
     }
     catch (Exception ex)
     {
-      ex.getStackTrace();
-      System.out.println("An error occurred while deleting the expense: " + ex.getMessage());
+      System.out.println("Database connection error: " + ex.getMessage());
       return 0;
     }
   }
 
-  public static int addExpense(Date date, String description, double amount, String company, String authorizedBy)
-  {
+  public static int addExpense(Date date, String description, BigDecimal amount, String company, String authorizedBy) {
     String sql = "INSERT INTO Expenses (Date, Company, Description, Amount, AuthorizedBy) VALUES (?, ?, ?, ?, ?)";
 
-    try (Connection conn = DB.connect();
-         PreparedStatement ps = conn.prepareStatement(sql))
-    {
+    try (Connection conn = DB.connect()) {
+      conn.setAutoCommit(false); // starting the transaction
 
-      ps.setDate(1, (java.sql.Date) date);
-      ps.setString(2, company);
-      ps.setString(3, description);
-      ps.setDouble(4, amount);
-      ps.setString(5, authorizedBy);
+      try (PreparedStatement ps = conn.prepareStatement(sql)) {
 
-      ps.executeQuery(sql);
+        ps.setDate(1, new java.sql.Date(date.getTime()));
+        ps.setString(2, company);
+        ps.setString(3, description);
+        ps.setBigDecimal(4, amount);
+        ps.setString(5, authorizedBy);
 
-      return 1;
+        ps.executeUpdate();
+        conn.commit(); // committing the transaction if successful
+
+        return 1;
+      }
+      catch (Exception ex)
+      {
+        conn.rollback(); // rolling back if an error occurs
+        System.out.println("An error occurred while adding the expense, no changes were made: " + ex.getMessage());
+        ex.getStackTrace();
+        return 0;
+      }
     }
     catch (Exception ex)
     {
-      ex.getStackTrace();
-      System.out.println("An error occurred while adding the expense: " + ex.getMessage());
+      System.out.println("Database connection error: " + ex.getMessage());
       return 0;
     }
   }
@@ -113,7 +127,7 @@ public class Expenses extends Transaction
 
     Scanner scanner = new Scanner(System.in);
 
-    String fetchSql = "SELECT * FROM Expenses WHERE ID = ?";
+    String fetchSql = "SELECT * FROM Expenses WHERE COLUMN_ID = ?";
     try (Connection conn = DB.connect();
          PreparedStatement fetchPs = conn.prepareStatement(fetchSql))
     {
@@ -143,18 +157,33 @@ public class Expenses extends Transaction
         case "date":
           System.out.println("Enter new Date (yyyy-mm-dd):");
           String date = scanner.nextLine();
-          updateSql = "UPDATE Expenses SET Date = ? WHERE ID = ?";
-          try (PreparedStatement updatePs = conn.prepareStatement(updateSql)) {
-            updatePs.setDate(1, java.sql.Date.valueOf(date));
-            updatePs.setInt(2, id);
-            updatePs.executeUpdate();
+
+          try
+          {
+            java.sql.Date newDate = java.sql.Date.valueOf(date);
+            updateSql = "UPDATE expenses SET Date = ? WHERE COLUMN_ID = ?";
+            try (PreparedStatement updatePs = conn.prepareStatement(updateSql))
+            {
+              updatePs.setDate(1, newDate);
+              updatePs.setInt(2, id);
+              updatePs.executeUpdate();
+            }
+            catch (IllegalArgumentException ex)
+            {
+              System.out.println("Invalid date format. Please use yyyy-MM-dd.");
+            }
+            break;
           }
-          break;
+          catch (Exception ex)
+          {
+            System.out.println("Database connection error: " + ex.getMessage());
+          }
+
 
         case "description":
           System.out.println("Enter new Description:");
           String description = scanner.nextLine();
-          updateSql = "UPDATE Expenses SET Description = ? WHERE ID = ?";
+          updateSql = "UPDATE EXPENSES SET Description = ? WHERE COLUMN_ID = ?";
           try (PreparedStatement updatePs = conn.prepareStatement(updateSql)) {
             updatePs.setString(1, description);
             updatePs.setInt(2, id);
@@ -165,7 +194,7 @@ public class Expenses extends Transaction
         case "amount":
           System.out.println("Enter new Amount:");
           double amount = scanner.nextDouble();
-          updateSql = "UPDATE Expenses SET Amount = ? WHERE ID = ?";
+          updateSql = "UPDATE Expenses SET Amount = ? WHERE COLUMN_ID = ?";
           try (PreparedStatement updatePs = conn.prepareStatement(updateSql)) {
             updatePs.setDouble(1, amount);
             updatePs.setInt(2, id);
@@ -176,7 +205,7 @@ public class Expenses extends Transaction
         case "company":
           System.out.println("Enter new Company:");
           String company = scanner.nextLine();
-          updateSql = "UPDATE Expenses SET Company = ? WHERE ID = ?";
+          updateSql = "UPDATE Expenses SET Company = ? WHERE COLUMN_ID = ?";
           try (PreparedStatement updatePs = conn.prepareStatement(updateSql)) {
             updatePs.setString(1, company);
             updatePs.setInt(2, id);
@@ -187,7 +216,7 @@ public class Expenses extends Transaction
         case "authorizedby":
           System.out.println("Enter new AuthorizedBy:");
           String authorizedBy = scanner.nextLine();
-          updateSql = "UPDATE Expenses SET AuthorizedBy = ? WHERE ID = ?";
+          updateSql = "UPDATE Expenses SET AuthorizedBy = ? WHERE COLUMN_ID = ?";
           try (PreparedStatement updatePs = conn.prepareStatement(updateSql)) {
             updatePs.setString(1, authorizedBy);
             updatePs.setInt(2, id);
@@ -238,7 +267,7 @@ public static void getTotalExpenses()
     {
       if (rs.next())
       {
-        totalExpenses = rs.getDouble("total_expenses");
+        totalExpenses = rs.getBigDecimal("total_expenses");
       }
       else
       {

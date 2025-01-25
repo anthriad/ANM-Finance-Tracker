@@ -1,5 +1,6 @@
 package org.yourcompany.yourproject;
 
+import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.util.Scanner;
 import java.sql.Date;
@@ -56,29 +57,32 @@ public class MainMenu {
                         {
                             case 1:
                                 Expenses.displayAllExpenses();
+                                break;
                             case 2:
                                 displayTotalExpenses();
+                                break;
                             case 3:
                                 addExpense();
+                                break;
                             case 4:
                                 editExpense();
+                                break;
                             case 5:
                                 deleteExpense();
+                                break;
                             // exit option - returning to the main menu
                             case 6:
                                 System.out.println("\nReturning to the main menu...");
-                                continue;
-
+                                break;
                             default:
                                 System.out.println("\nI'm sorry, that option is not available. Please try again.\n");
                         }
-
-
                     }
                     catch (Exception e)
                     {
                         System.out.println(e.getMessage());
                     }
+                    break;
 
                     // Revenue Menu
                 case 2:
@@ -113,6 +117,7 @@ public class MainMenu {
                     {
                         System.out.println(e.getMessage());
                     }
+                    break;
 
                     // Deposits Menu
                 case 3:
@@ -153,6 +158,7 @@ public class MainMenu {
                     {
                         System.out.println(e.getMessage());
                     }
+                    break;
 
                     // Net Profits Menu
                 case 4:
@@ -187,6 +193,7 @@ public class MainMenu {
                     {
                         System.out.println(e.getMessage());
                     }
+                    break;
 
                     // exit option
                 case 5:
@@ -206,7 +213,7 @@ public class MainMenu {
         }
     }
 
-    private static void followUpQuestion()
+    private static void followUpQuestion() // NEEDS ADJUSTING
     {
         System.out.println("Is there anything else you would like to do? (Y/N)");
         String answer = userInput.nextLine();
@@ -214,9 +221,9 @@ public class MainMenu {
         switch (answer)
         {
             case "Y":
-                break;
-            case "N":
                 return;
+            case "N":
+                break;
             default:
                 System.out.println("\nI'm sorry, that option is not available. Please try again.");
         }
@@ -225,7 +232,7 @@ public class MainMenu {
 ///
 /// EXPENSE FUNCTIONS
 ///
-    private static void addExpense()
+    private static void addExpense() //TESTED AND FUNCTIONS WELL!
     {
         try {
             System.out.println("Attempting to add an expense...");
@@ -233,18 +240,23 @@ public class MainMenu {
             // setting up the date in the sql format
             LocalDate today = LocalDate.now();
             Date todaysDate = Date.valueOf(today);
+            userInput.nextLine();
 
             System.out.println("Enter the name of company charging the expense: ");
             String companyName = userInput.nextLine();
+//            userInput.nextLine();
 
             System.out.println("Enter a short description of the expense: ");
             String expenseDescription = userInput.nextLine();
+//            userInput.nextDouble();
 
             System.out.println("Enter the amount of the expense: ");
-            double expenseAmount = userInput.nextDouble();
+            BigDecimal expenseAmount = userInput.nextBigDecimal();
+            userInput.nextLine();
 
             System.out.println("Enter your initials: ");
             String authorizedUser = userInput.nextLine();
+
 
             if (authorizedUser.equals("AR") || authorizedUser.equals("AG") || authorizedUser.equals("NA") || authorizedUser.equals("MS")) {
 
@@ -259,7 +271,7 @@ public class MainMenu {
                     System.out.println("An issue occurred while trying to delete the expense.");
                 }
 
-                followUpQuestion();
+//               followUpQuestion();
             }
             else
             {
@@ -273,7 +285,7 @@ public class MainMenu {
     }
 
 
-    private static void editExpense()
+    private static void editExpense() //NEEDS WORK AND TESTING
     {
         try
         {
@@ -301,7 +313,7 @@ public class MainMenu {
         }
     }
 
-    private static void deleteExpense()
+    private static void deleteExpense() //TESTED AND WORKS!
     {
         try
         {
@@ -328,7 +340,7 @@ public class MainMenu {
         }
     }
 
-    private static void displayTotalExpenses()
+    private static void displayTotalExpenses() //NEEDS TESTING
     {
         System.out.println("Retrieving total amount of expenses... ");
 
@@ -336,5 +348,10 @@ public class MainMenu {
 
         followUpQuestion();
 
+    }
+
+    public enum AuthorizedUser
+    {
+        AR, AG, NA, MS
     }
 }
