@@ -41,16 +41,40 @@ public class Expenses extends Transaction
          ResultSet rs = ps.executeQuery())
     {
       int columnCount = rs.getMetaData().getColumnCount();
+      List<String> columnNames = new ArrayList<>();
 
-      while (rs.next())
-      {
-        Map<String, Object> row = new HashMap<>();
-        for (int i = 1; i <= columnCount; i++)
-        {
-          String columnName = rs.getMetaData().getColumnName(i);
-          row.put(columnName, rs.getObject(i));
+      // getting the column names
+      for (int i = 1; i <= columnCount; i++) {
+        columnNames.add(rs.getMetaData().getColumnName(i));
+      }
+
+      // getting the rows
+      while (rs.next()) {
+        Map<String, Object> row = new LinkedHashMap<>();
+
+        for (String columnName : columnNames) {
+          Object value = rs.getObject(columnName);
+
+          if ("amount".equals(columnName) && value instanceof BigDecimal)
+          {
+            row.put(columnName, (BigDecimal) value);
+          }
+          else
+          {
+            row.put(columnName, value);
+          }
         }
         expensesTable.add(row);
+      }
+
+      if (!expensesTable.isEmpty()) {
+        printTableHeader(columnNames);
+
+        for (Map<String, Object> row : expensesTable) {
+          printTableRow(columnNames, row);
+        }
+      } else {
+        System.out.println("No expenses found!");
       }
     }
     catch (Exception ex)
@@ -58,6 +82,24 @@ public class Expenses extends Transaction
       ex.getStackTrace();
       System.out.println("An error occurred while retrieving the expenses table: " + ex.getMessage());
     }
+  }
+
+  private static void printTableHeader(List<String> columnNames) {
+    System.out.println("+------------+------------+------------+-----------------+-----------+--------------+");
+    System.out.printf("| %-10s | %-10s | %-10s | %-15s | %-9s | %-12s |\n",
+            "Expense_ID", "Date", "Company", "Description", "Amount", "AuthorizedBy");
+    System.out.println("+------------+------------+------------+-----------------+-----------+--------------+");
+  }
+
+  private static void printTableRow(List<String> columnNames, Map<String, Object> row) {
+    System.out.printf("| %-10s | %-10s | %-10s | %-15s | %9s | %-12s |\n",
+            row.get("expense_id"),
+            row.get("date"),
+            row.get("company"),
+            row.get("description"),
+            row.get("amount") instanceof BigDecimal ? ((BigDecimal) row.get("amount")).toPlainString() : row.get("amount"),
+            row.get("authorizedby"));
+    System.out.println("+------------+------------+------------+-----------------+-----------+--------------+");
   }
 
   public static int deleteExpense(int id)
@@ -229,23 +271,7 @@ public class Expenses extends Transaction
           return 0;
       }
 
-//      System.out.println("Expense updated successfully.");
       return 1;
-//    String sql = "UPDATE Expenses SET Date = ?, Description = ?, Amount = ?, Company = ?, AuthorizedBy = ? WHERE ID = ?";
-//
-//    try (Connection conn = DB.connect();
-//        PreparedStatement ps = conn.prepareStatement(sql))
-//    {
-//
-//      ps.setDate(1, (java.sql.Date) date);
-//      ps.setString(2, description);
-//      ps.setDouble(3, amount);
-//      ps.setString(4, company);
-//      ps.setString(5, authorizedBy);
-//
-//      ps.executeUpdate();
-//
-//      return 1;
     }
     catch (Exception ex)
     {
@@ -255,7 +281,6 @@ public class Expenses extends Transaction
     }
   }
 
-//  private double getTotalExpenses()
 public static void getTotalExpenses()
   {
 
