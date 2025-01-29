@@ -199,7 +199,7 @@ public class MainMenu {
                 case 5:
                     try
                     {
-                        System.out.println("Thank you for stopping by! We'll see you next time!");
+                        System.out.println("Thank you for stopping by! We'll see you next time!\n");
                         return;
                     }
                     catch (Exception e)
@@ -285,7 +285,7 @@ public class MainMenu {
     }
 
 
-    private static void editExpense() //NEEDS WORK AND TESTING
+    private static void editExpense() // TESTED AND WORKS!
     {
         try
         {
@@ -305,7 +305,7 @@ public class MainMenu {
                 System.out.println("An issue occurred while trying to edit the expense with ID " + expenseID + ".");
             }
 
-            followUpQuestion();
+//            followUpQuestion(); // commented out temporarily until I fix it
         }
         catch (Exception e)
         {

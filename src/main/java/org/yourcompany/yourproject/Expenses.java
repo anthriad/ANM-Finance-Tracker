@@ -127,7 +127,7 @@ public class Expenses extends Transaction
 
     Scanner scanner = new Scanner(System.in);
 
-    String fetchSql = "SELECT * FROM Expenses WHERE COLUMN_ID = ?";
+    String fetchSql = "SELECT * FROM Expenses WHERE expense_id = ?";
     try (Connection conn = DB.connect();
          PreparedStatement fetchPs = conn.prepareStatement(fetchSql))
     {
@@ -149,7 +149,7 @@ public class Expenses extends Transaction
       System.out.println("AuthorizedBy: " + rs.getString("AuthorizedBy"));
 
       // Prompt for updates
-      System.out.println("What would you like to edit? (Enter field name: Date, Description, Amount, Company, AuthorizedBy)");
+      System.out.println("\nWhat would you like to edit? (Enter field name: Date, Description, Amount, Company, AuthorizedBy)");
       String field = scanner.nextLine();
 
       String updateSql = null;
@@ -161,7 +161,7 @@ public class Expenses extends Transaction
           try
           {
             java.sql.Date newDate = java.sql.Date.valueOf(date);
-            updateSql = "UPDATE expenses SET Date = ? WHERE COLUMN_ID = ?";
+            updateSql = "UPDATE expenses SET Date = ? WHERE expense_id = ?";
             try (PreparedStatement updatePs = conn.prepareStatement(updateSql))
             {
               updatePs.setDate(1, newDate);
@@ -183,7 +183,7 @@ public class Expenses extends Transaction
         case "description":
           System.out.println("Enter new Description:");
           String description = scanner.nextLine();
-          updateSql = "UPDATE EXPENSES SET Description = ? WHERE COLUMN_ID = ?";
+          updateSql = "UPDATE EXPENSES SET Description = ? WHERE expense_id = ?";
           try (PreparedStatement updatePs = conn.prepareStatement(updateSql)) {
             updatePs.setString(1, description);
             updatePs.setInt(2, id);
@@ -193,10 +193,10 @@ public class Expenses extends Transaction
 
         case "amount":
           System.out.println("Enter new Amount:");
-          double amount = scanner.nextDouble();
-          updateSql = "UPDATE Expenses SET Amount = ? WHERE COLUMN_ID = ?";
+          BigDecimal amount = scanner.nextBigDecimal();
+          updateSql = "UPDATE Expenses SET Amount = ? WHERE expense_id = ?";
           try (PreparedStatement updatePs = conn.prepareStatement(updateSql)) {
-            updatePs.setDouble(1, amount);
+            updatePs.setBigDecimal(1, amount);
             updatePs.setInt(2, id);
             updatePs.executeUpdate();
           }
@@ -205,7 +205,7 @@ public class Expenses extends Transaction
         case "company":
           System.out.println("Enter new Company:");
           String company = scanner.nextLine();
-          updateSql = "UPDATE Expenses SET Company = ? WHERE COLUMN_ID = ?";
+          updateSql = "UPDATE Expenses SET Company = ? WHERE expense_id = ?";
           try (PreparedStatement updatePs = conn.prepareStatement(updateSql)) {
             updatePs.setString(1, company);
             updatePs.setInt(2, id);
@@ -216,7 +216,7 @@ public class Expenses extends Transaction
         case "authorizedby":
           System.out.println("Enter new AuthorizedBy:");
           String authorizedBy = scanner.nextLine();
-          updateSql = "UPDATE Expenses SET AuthorizedBy = ? WHERE COLUMN_ID = ?";
+          updateSql = "UPDATE Expenses SET AuthorizedBy = ? WHERE expense_id = ?";
           try (PreparedStatement updatePs = conn.prepareStatement(updateSql)) {
             updatePs.setString(1, authorizedBy);
             updatePs.setInt(2, id);
@@ -229,7 +229,7 @@ public class Expenses extends Transaction
           return 0;
       }
 
-      System.out.println("Expense updated successfully.");
+//      System.out.println("Expense updated successfully.");
       return 1;
 //    String sql = "UPDATE Expenses SET Date = ?, Description = ?, Amount = ?, Company = ?, AuthorizedBy = ? WHERE ID = ?";
 //
