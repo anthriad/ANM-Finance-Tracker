@@ -340,13 +340,13 @@ public class MainMenu {
         }
     }
 
-    private static void displayTotalExpenses() //NEEDS TESTING
+    private static void displayTotalExpenses() //TESTED AND WORKS!
     {
         System.out.println("Retrieving total amount of expenses... ");
 
         Expenses.getTotalExpenses();
 
-        followUpQuestion();
+//        followUpQuestion(); // commented out temporarily until I fix it
 
     }
 

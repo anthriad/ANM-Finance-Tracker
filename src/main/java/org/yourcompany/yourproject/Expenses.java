@@ -275,13 +275,11 @@ public static void getTotalExpenses()
       }
 
       System.out.println("Total expenses: " + totalExpenses);
-//      return totalExpenses; // returning the total amount of expenses that have accrued
     }
     catch (Exception ex)
     {
       ex.getStackTrace();
       System.out.println("An error occurred while getting the expenses: " + ex.getMessage());
-//      return 0;
     }
   }
 
